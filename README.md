@@ -7,7 +7,7 @@ Fullstack portfolio (Next.js 16 + Prisma) matching the approved
   `DATABASE_URL`) — local and production alike. No SQLite.
 - **Uploads:** Vercel Blob (`BLOB_READ_WRITE_TOKEN`).
 - **Admin:** `/admin` — email + password (DB-backed). Seeded login:
-  `admin@portfolio.local` / `changeme123` — change it in
+  `` / `` — change it in
   Admin → Profile immediately.
 
 Setup and deployment steps: see **DEPLOY.md**.
