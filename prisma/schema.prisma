@@ -1,0 +1,165 @@
+// Portfolio — production database is Neon Postgres ONLY.
+// Local dev and production both use the pooled Neon connection string in
+// DATABASE_URL (see DEPLOY.md). There is no SQLite / local database.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MessageStatus {
+  NEW
+  READ
+  ARCHIVED
+}
+
+enum CertType {
+  CERTIFICATION
+  AWARD
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String // bcryptjs hash
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// Key-value site settings (Admin → Settings). Keys are defined in
+// src/lib/site-defaults.ts; the seed creates them once and never overwrites.
+model SiteSetting {
+  key       String   @id
+  value     String   @default("")
+  updatedAt DateTime @updatedAt
+}
+
+model Project {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  category  String // design | development | branding | motion
+  catLabel  String // display label, e.g. "Web Design · Development"
+  year      String
+  tagline   String
+  client    String
+  role      String
+  services  String // JSON array of strings
+  heroImage String
+  heroAlt   String
+  thumb     String? // card thumbnail (null = motion cover treatment)
+  thumbAlt  String
+  challenge String
+  built     String
+  outcome   String
+  stats     String // JSON array of { n, l }
+  images    String // JSON array of { img, alt } — detail-page image pair
+  tech      String // JSON array of technology names
+  liveUrl   String? // public "Visit live site" button renders only when set
+  videoUrl  String? // project video block on the detail page renders only when set
+  sortOrder Int      @default(0)
+  featured  Boolean  @default(false)
+  visible   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Technology {
+  id         String   @id @default(cuid())
+  name       String
+  category   String // frontend | backend | languages | database | tools
+  catLabel   String // display label, e.g. "Tools & AI"
+  logo       String // /assets/logos/... path or uploaded Blob URL
+  darkBubble Boolean  @default(false) // white logos sit on dark bubbles
+  sortOrder  Int      @default(0)
+  visible    Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model EducationItem {
+  id        String   @id @default(cuid())
+  title     String
+  org       String
+  location  String
+  period    String // e.g. "2015 — 2019"
+  kicker    String // story chapter kicker, e.g. "The Foundation"
+  image     String
+  imageAlt  String
+  desc      String
+  sortOrder Int      @default(0)
+  visible   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ExperienceItem {
+  id        String   @id @default(cuid())
+  role      String
+  org       String
+  location  String
+  period    String
+  points    String // JSON array of bullet strings
+  tech      String // JSON array of technology names
+  sortOrder Int      @default(0)
+  visible   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Certification {
+  id        String   @id @default(cuid())
+  title     String
+  issuer    String
+  year      String
+  type      CertType @default(CERTIFICATION)
+  sortOrder Int      @default(0)
+  visible   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  quote     String
+  name      String
+  initials  String
+  role      String // e.g. "Founder, Nordhaus Studio — Berlin"
+  sortOrder Int      @default(0)
+  visible   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GalleryItem {
+  id        String   @id @default(cuid())
+  title     String
+  category  String // design | development | workspace | personal
+  catLabel  String
+  image     String
+  caption   String
+  alt       String
+  ratio     String   @default("ar-sq") // ar-wide | ar-tall | ar-sq (masonry shape)
+  sortOrder Int      @default(0)
+  visible   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id        String        @id @default(cuid())
+  name      String
+  email     String
+  org       String?
+  subject   String?
+  body      String
+  status    MessageStatus @default(NEW)
+  ip        String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
